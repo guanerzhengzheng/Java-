@@ -69,15 +69,45 @@
   - 避免重复加载
   -  确保类的唯一性性 
 
-- 自定义类加载器
+5）自定义类加载器
 
-  - 继承ClassLoad 
-  - 覆盖 findClass方法 不会打破 双亲委派
-  - 或者load class 方法    会打破双亲委派
+- 继承ClassLoad 
+- 覆盖 findClass方法 不会打破 双亲委派
+- 或者load class 方法    会打破双亲委派
 
-- ClassLoad中loadClass  findClass defineClass的区别 
+6）ClassLoad中loadClass  findClass defineClass的区别 
 
-#### 1.1.3 垃圾收集器 
+- loadClass() 就是主要进行类加载的方法，其中实现了双亲委派算法
+- findClass 根据名称或者位置加载class字节码 
+- defineClass将字节码转化为Class 
+
+7）class.forName 和 class.loadClass的区别
+
+- class.forName会初始化类 
+-  class.loadClass 只是加载了类，不会对类进行初始化 
+
+#### 1.1.3 JVM 中对象内存的分布 
+
+1) 对象的组成
+
+- 对象头
+  - 对象自身运行时的数据  哈希码，GC分代年龄，锁状态标志 ，线程持有的锁， 线程线程ID，偏向时间戳
+  - 类型指针，指向元空间的class的元数据 
+- 实例数据 
+- 对其填充
+
+#### 1.1.4 垃圾回收机制
+
+1） 堆的分区
+
+- 年轻代 
+-  年老代 
+
+
+
+
+
+#### 1.1.4 垃圾收集器 
 
 ##### 1）CMS （Concurent Mark Sweet）   - 标记清除算法
 
