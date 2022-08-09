@@ -100,8 +100,53 @@
 
 1） 堆的分区
 
-- 年轻代 
--  年老代 
+- 年轻代   占比 1/3    Edia 和 survivor的占比8:1:1 
+-  年老代  占比 2/3 
+
+2）动态年龄判断
+
+- survivor区的对象从小到大进行累加，当累加到X年龄时占用空间的总和大于 50%，那么比X年龄大的对象会晋升到老年代
+
+3)  对象进入老年代的时间节点 
+
+-  躲过了15次major gc
+
+- 动态年龄判断  
+
+- 老年代空间担保机制
+
+  <img src="/Users/zhengyonggang/Library/Application Support/typora-user-images/image-20220726022341856.png" alt="image-20220726022341856" style="zoom:50%;" align = "left"/>
+
+- 大对象直接进入老年代  
+
+  - PretenuureSizeThreahold 设置多大的字节直接进入老年代 
+
+
+
+#### 1.1.5 JVM 相关的重要参数
+
+- Xms 初始堆内存大小 
+- Xmx  堆的最大值 
+- Xmn 堆中年轻代的大小
+- MatespaceSize  元空间大小
+- MaxMetaspaceSize 最大元空间大小
+- Xss   每个线程的栈内存大小
+- SuvivorRatio = 8 edina 和 survivor区的比例大小是8:1:1
+-  MaxTenuringThreshold  =15(并发收集器) 年龄阈值 
+-  MaxTenuringThreshold  =6(CMS收集器)
+
+#### 1.1.6 如何实现Java热部署 
+
+- 重写classLoad 
+- 定时任务 
+- 根据修改时间判断class是否发生变化
+
+#### 1.1.7  Java中不同的引用类型 
+
+- 强引用   - 内存不足时会报 out of memery 
+- 软引用  -  内存不足时会被回收
+- 弱引用   - 只要gc内存就会被回收 
+- 虚引用  
 
 
 
@@ -109,7 +154,7 @@
 
 #### 1.1.4 垃圾收集器 
 
-##### 1）CMS （Concurent Mark Sweet）   - 标记清除算法
+##### 1）CMS （Concurent Mark Sweet）   -标记清除算法
 
 - 定义
   - 最短回收停顿时间为目标的收集器 
@@ -128,9 +173,49 @@
 - 特点 
   - 将堆内存 分为2048 个 region 区域，有逻辑上的各种分区
   - <img src="/Users/zhengyonggang/Desktop/MyFile/博客/JVM相关/image-20220723224509264.png" alt="image-20220723224509264" style="zoom:33%;" align="left"/>
-  - 优先回收垃圾最多的region 
+  - Hum 大对象 超过region大小的一半
+  - 优先回收垃圾最多的region，在有限的时间内尽量回收最多垃圾
+  - 可以设置垃圾回收预期的停顿时间 
+  - 新生代达到堆的 60% 开始回收，会stw 
+  - 新生代默认 占堆的 5%   最大60% 动态变化
+  - 回收过程
+    - 初始标记  -标记gc root 直接关联的对象 ， 速度很快，会触发stop world
+    - 并发标记  -并发进行剩余对象的标记 ，用户进程也会并发的执行任务，不会stop the world，但是比较耗时
+    - 重新标记  -因为并发标记的用户进程还在执行，所以对象的依赖关系可能发送变化，需要重新标记，此时会stop the world
+    - 并发清除 - 用户进程会并发执行，不会stop the world 
+  - 混合垃圾回收 
+  - fullgc  对象的分配赶不上对象回收的速度
+  - ![image-20220808034048665](/Users/zhengyonggang/Library/Application Support/typora-user-images/image-20220808034048665.png)
+
+##### 3）Serial 垃圾收集器 
+
+- 新生代，串行，单线程  client 模型下的垃圾收集器 
+
+##### 4）ParNew
+
+- 新生代的垃圾收集器 ，多线程 ，尽量配置成和cpu 核数一样
+
+5）Parallel 
+
+- 新生代 并行多线程，复制算法，达到可控的吞吐量，新生代默认的垃圾收集器  
+
+
+
+#### 1.1.5 内存泄露 
+
+
+
+1.1.6 线上参数配置
+
+![image-20220808034646339](/Users/zhengyonggang/Library/Application Support/typora-user-images/image-20220808034646339.png)
+
+
 
 ### 1.2 线上问题结合
+
+1.1 线上参数配置 
+
+
 
 
 
